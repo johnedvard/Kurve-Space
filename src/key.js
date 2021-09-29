@@ -1,20 +1,20 @@
-var _pressed: any = {};
-var key: any = {};
+var _pressed = {};
+var key = {};
 
 key.LEFT = 37;
 key.UP = 38;
 key.RIGHT = 39;
 key.DOWN = 40;
 
-key.isDown = function (keyCode: number) {
+key.isDown = function (keyCode) {
   return _pressed[keyCode];
 };
 
-key.onKeydown = function (event: any) {
+key.onKeydown = function (event) {
   _pressed[event.keyCode] = true;
 };
 
-key.onKeyup = function (event: any) {
+key.onKeyup = function (event) {
   _pressed[event.keyCode] = null;
 };
 

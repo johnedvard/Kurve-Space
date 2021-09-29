@@ -1,9 +1,4 @@
-import { NearConnection } from './nearConnection';
-
-export const loginout = (
-  loginoutEl: HTMLElement,
-  nearConnection: NearConnection
-): void => {
+export const loginout = (loginoutEl, nearConnection) => {
   if (!nearConnection) return;
   if (nearConnection.walletConnection.isSignedIn()) {
     nearConnection.logout();
@@ -14,8 +9,8 @@ export const loginout = (
   }
 };
 
-export const initLoginLogout = (nearConnection: NearConnection) => {
-  const loginoutEl: HTMLElement = document.getElementById('loginout');
+export const initLoginLogout = (nearConnection) => {
+  const loginoutEl = document.getElementById('loginout');
   if (
     nearConnection &&
     nearConnection.walletConnection &&

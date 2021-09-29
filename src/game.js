@@ -1,13 +1,17 @@
-import { init } from './../kontra/src/core';
-import { bindKeys, initKeys } from './../kontra/src/keyboard';
-import { initPointer } from './../kontra/src/pointer';
-import GameLoop from './../kontra/src/gameLoop';
+import {
+  init,
+  bindKeys,
+  initKeys,
+  initPointer,
+  GameLoop,
+  emit,
+  on,
+} from 'kontra';
 import { IGameObject } from './iGameobject';
 import { NearConnection } from './near/nearConnection';
 import { initLoginLogout } from './near/nearLogin';
 import { Player } from './player';
 import { Menu } from './menu';
-import { emit, on } from '../kontra/src/events';
 import { GameEvent } from './gameEvent';
 import { createColorFromName } from './gameUtils';
 import { PlayerState } from './playerState';
@@ -15,22 +19,22 @@ import { DeadFeedback } from './deadFeedback';
 import { playSong, toggleSond } from './sound';
 
 export class Game {
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
+  canvas;
+  ctx;
   x = 10;
-  gos: IGameObject[] = [];
-  player: Player;
-  menu: Menu;
-  scale: number;
+  gos = [];
+  player;
+  menu;
+  scale;
   canvasWidth = 800;
   canvasHeight = 600;
   extraPlayerNames = ['e500ff', '814007', '1d34fa'];
   maxPlayers = 4;
-  players: Player[] = [];
+  players = [];
   isGameOver = false;
   isGameStarted = false;
-  nearConnection: NearConnection;
-  constructor(canvas: HTMLCanvasElement) {
+  nearConnection;
+  constructor(canvas) {
     this.initNear();
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -44,17 +48,17 @@ export class Game {
     this.initLoop();
     this.handleGameInput();
     this.gos.push(new DeadFeedback(this));
-    on(GameEvent.startGame, (props: any) => this.onStartGame(props));
-    on(GameEvent.newGame, (props: any) => this.onNewGame(props));
+    on(GameEvent.startGame, (props) => this.onStartGame(props));
+    on(GameEvent.newGame, (props) => this.onNewGame(props));
     window.addEventListener(
       'drand',
-      (e: any) => {
+      (e) => {
         this.setNewPlayerNames(e.detail);
       },
       false
     );
   }
-  setNewPlayerNames(colorNames: string[]) {
+  setNewPlayerNames(colorNames) {
     colorNames.forEach((cn, index) => {
       this.extraPlayerNames[index] = cn;
     });
@@ -87,8 +91,8 @@ export class Game {
   initLoop() {
     this.gos.push(this.menu);
 
-    const loop: any = new GameLoop({
-      update: (dt: number) => {
+    const loop = new GameLoop({
+      update: (dt) => {
         this.gos.forEach((go) => go.update(dt));
         this.checkGameOver();
       },
@@ -116,7 +120,7 @@ export class Game {
       initLoginLogout(nearConnection);
     });
   }
-  onStartGame(props: { spaceShipRenderIndices: number[]; userName: string }) {
+  onStartGame(props) {
     this.isGameStarted = true;
     if (this.gos.includes(this.menu)) {
       this.gos.splice(this.gos.indexOf(this.menu), 1);
@@ -144,12 +148,12 @@ export class Game {
       });
     playSong();
   }
-  setPlayerColor(name: string) {
+  setPlayerColor(name) {
     if (this.players && this.players[0]) {
       this.players[0].setColor('#' + createColorFromName(name));
     }
   }
-  onNewGame(props: any) {
+  onNewGame(props) {
     this.isGameOver = false;
     this.players.forEach((p) => {
       p.resetPlayer();

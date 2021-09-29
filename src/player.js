@@ -1,43 +1,35 @@
-import { IGameObject } from './iGameobject';
+import { emit, on, Vector, bindKeys } from 'kontra';
 import { PlayerState } from './playerState';
-import { emit, on } from '../kontra/src/events';
 import { GameEvent } from './gameEvent';
-import KontraVector from '../kontra/src/vector';
-import { Game } from './game';
 import { getPlayerControls, getRandomPos, isOutOfBounds } from './gameUtils';
-import { Vector, Sprite } from '../kontra/kontra';
 import { SpaceShip } from './spaceShip';
 import { MonetizeEvent } from './monetizeEvent';
 import { EngineParticleEffect } from './engineParticleEffect';
 import { addPlayer, checkLineIntersection, playerTrails } from './trails';
-import { bindKeys } from '../kontra/src/keyboard';
 import { Bullet } from './bullet';
 
-class Player implements IGameObject {
-  sprite: Sprite;
-  spaceShip: SpaceShip;
-  playerState: PlayerState = PlayerState.idle;
-  trails: Vector[][] = []; // list of line segments
-  ctx: CanvasRenderingContext2D;
-  speed: number;
-  effect: EngineParticleEffect;
-  playerId: number;
+class Player {
+  sprite;
+  spaceShip;
+  playerState = PlayerState.idle;
+  trails = []; // list of line segments
+  ctx;
+  speed;
+  effect;
+  playerId;
   rotating = false;
   maxBullets = 1;
   numBullets = this.maxBullets;
-  bullets: Bullet[] = [];
+  bullets = [];
   timeToAddTrailInterval = 0.05; //s
   timeSinceLastTrailAdded = 0;
-  constructor(
-    private game: Game,
-    private scale: number,
-    private playerProps: {
-      color: string;
-      isAi: boolean;
-      spaceShipRenderIndex: number;
-      playerId: number;
-    }
-  ) {
+  playerProps;
+  scale;
+  game;
+  constructor(game, scale, playerProps) {
+    this.playerProps = playerProps;
+    this.scale = scale;
+    this.game = game;
     this.playerId = this.playerProps.playerId;
     this.effect = new EngineParticleEffect();
     this.speed = 100 * this.scale;
@@ -68,17 +60,17 @@ class Player implements IGameObject {
       { handler: 'keyup' }
     );
 
-    on(GameEvent.weaponAttack, (evt: any) => this.onPayerAttack(evt));
+    on(GameEvent.weaponAttack, (evt) => this.onPayerAttack(evt));
     on(GameEvent.startTrace, () => this.onStartTrace());
-    on(GameEvent.hitTrail, (evt: any) => this.onHitTrail(evt));
-    on(GameEvent.hitWall, (evt: any) => this.onHitWall(evt));
-    on(GameEvent.gameOver, (evt: any) => this.onGameOver(evt));
+    on(GameEvent.hitTrail, (evt) => this.onHitTrail(evt));
+    on(GameEvent.hitWall, (evt) => this.onHitWall(evt));
+    on(GameEvent.gameOver, (evt) => this.onGameOver(evt));
     on(MonetizeEvent.progress, this.onMonetizeProgress);
 
     this.sprite = this.spaceShip.sprite;
     addPlayer(this);
   }
-  onPayerAttack(evt: { sprite: Sprite }) {
+  onPayerAttack(evt) {
     if (
       evt.sprite == this.sprite &&
       this.game.isGameStarted &&
@@ -94,14 +86,14 @@ class Player implements IGameObject {
       --this.numBullets;
     }
   }
-  onMonetizeProgress = (evt: any) => {
+  onMonetizeProgress = (evt) => {
     if (
       this.spaceShip.spaceshipIndex !== this.playerProps.spaceShipRenderIndex
     ) {
       this.spaceShip.spaceshipIndex = this.playerProps.spaceShipRenderIndex;
     }
   };
-  update(dt: number): void {
+  update(dt) {
     this.addPointToTrail(dt);
     this.sprite.update(dt);
     checkLineIntersection(this.getLastTrailPoint(), this.sprite);
@@ -110,18 +102,18 @@ class Player implements IGameObject {
     this.updateDeadPlayer();
     this.bullets.forEach((b) => b.update(dt));
   }
-  render(): void {
+  render() {
     this.renderTrail();
     this.sprite.render();
     this.effect.render();
     this.renderDeadPlayer();
     this.bullets.forEach((b) => b.render());
   }
-  addPointToTrail(dt: number) {
+  addPointToTrail(dt) {
     if (this.playerState === PlayerState.tracing) {
       this.timeSinceLastTrailAdded += dt;
       if (this.timeSinceLastTrailAdded >= this.timeToAddTrailInterval) {
-        this.getEndTrail().push(KontraVector(this.sprite.x, this.sprite.y));
+        this.getEndTrail().push(Vector(this.sprite.x, this.sprite.y));
         this.timeSinceLastTrailAdded = 0;
       }
     }
@@ -153,21 +145,9 @@ class Player implements IGameObject {
     this.sprite.dx = this.speed;
     this.sprite.dy = this.speed;
     this.setPlayerState(PlayerState.tracing);
-    this.getEndTrail().push(KontraVector(this.sprite.x, this.sprite.y));
+    this.getEndTrail().push(Vector(this.sprite.x, this.sprite.y));
   }
-  onHitTrail({
-    point,
-    go,
-    playerId,
-    trailIndex,
-    segmentIndex,
-  }: {
-    point: Vector;
-    go: Sprite;
-    playerId: number;
-    trailIndex: number;
-    segmentIndex: number;
-  }) {
+  onHitTrail({ point, go, playerId, trailIndex, segmentIndex }) {
     if (go === this.sprite) {
       this.setPlayerState(PlayerState.dead);
       // finish trail by adding last point
@@ -175,13 +155,13 @@ class Player implements IGameObject {
     }
     if (!this.spaceShip.rotating) {
       // Add point to prevent alive player from dying right after being hit, but only if not rotating
-      this.getEndTrail().push(KontraVector(this.sprite.x, this.sprite.y));
+      this.getEndTrail().push(Vector(this.sprite.x, this.sprite.y));
     }
     if (playerId === this.playerId) {
       this.splitLineSegment({ segmentIndex, trailIndex });
     }
   }
-  splitLineSegment({ segmentIndex, trailIndex }: any) {
+  splitLineSegment({ segmentIndex, trailIndex }) {
     const orgSegment = [...this.trails[segmentIndex]];
     this.trails[segmentIndex].length = 0;
     const newTrail = [];
@@ -195,12 +175,12 @@ class Player implements IGameObject {
     }
     this.trails.push(newTrail);
   }
-  onGameOver(props: { winner: Player }) {
+  onGameOver(props) {
     if (props.winner === this) {
       this.setPlayerState(PlayerState.idle);
     }
   }
-  onHitWall({ point, go }: { point: Vector; go: Sprite }) {
+  onHitWall({ point, go }) {
     if (go === this.sprite) {
       this.setPlayerState(PlayerState.dead);
       // finish trail by adding last point
@@ -212,7 +192,7 @@ class Player implements IGameObject {
       this.playerState === PlayerState.tracing &&
       isOutOfBounds(this.game, this.sprite)
     ) {
-      const point: Vector = KontraVector(this.sprite.x, this.sprite.y);
+      const point = Vector(this.sprite.x, this.sprite.y);
       emit(GameEvent.hitWall, {
         point: point,
         go: this.sprite,
@@ -229,7 +209,7 @@ class Player implements IGameObject {
       // TODO create something nice
     }
   }
-  setPlayerState(state: PlayerState) {
+  setPlayerState(state) {
     if (this.playerState !== state) {
       this.playerState = state;
       emit(GameEvent.playerStateChange, { state, ship: this.spaceShip });
@@ -242,7 +222,7 @@ class Player implements IGameObject {
       }
     }
   }
-  updateEngineEffect(dt: number) {
+  updateEngineEffect(dt) {
     this.effect.sprite.x = this.sprite.x - 5;
     this.effect.sprite.y = this.sprite.y - 5;
     this.effect.dx = this.sprite.dx;
@@ -259,19 +239,19 @@ class Player implements IGameObject {
     this.resetStartPos();
   }
   // The last trail of all line segments
-  getEndTrail(): Vector[] {
+  getEndTrail() {
     return this.trails[this.trails.length - 1];
   }
-  getLastTrailPoint(): Vector {
+  getLastTrailPoint() {
     if (this.getEndTrail()) {
       return this.getEndTrail()[this.getEndTrail().length - 1];
     }
   }
-  setColor(color: string) {
+  setColor(color) {
     this.sprite.color = color;
     this.spaceShip.sprite.color = color;
   }
-  private resetStartPos() {
+  resetStartPos() {
     this.spaceShip.sprite.x = getRandomPos(
       this.game.canvasWidth * this.game.scale
     );

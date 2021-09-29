@@ -1,11 +1,8 @@
-import KontraSprite from '../kontra/src/sprite';
-import KontraPool from '../kontra/src/pool';
-import kontra, { Pool, Sprite } from '../kontra/kontra';
-import { IGameObject } from './iGameobject';
+import { Pool, Sprite } from 'kontra';
 
-export class EngineParticleEffect implements IGameObject {
-  sprite: Sprite;
-  private pool: Pool;
+export class EngineParticleEffect {
+  sprite;
+  pool;
   x = 0;
   y = 0;
   dx = 0;
@@ -13,14 +10,13 @@ export class EngineParticleEffect implements IGameObject {
   rotation = 0;
   speed = 0.5;
   constructor() {
-    this.pool = KontraPool({
-      create: KontraSprite,
-      size: 10,
+    this.pool = Pool({
+      create: Sprite,
     });
-    const kontraSprite: any = KontraSprite({
+    const kontraSprite = Sprite({
       x: 0,
       y: 0,
-      update: (dt: number) => {
+      update: (dt) => {
         this.updatePool(dt);
       },
       render: () => {
@@ -33,7 +29,7 @@ export class EngineParticleEffect implements IGameObject {
   coneEffect() {
     return ((1 - Math.random() * 2) / 4) * Math.sign(Math.cos(this.rotation));
   }
-  updatePool(dt: number) {
+  updatePool(dt) {
     this.pool.get({
       x: 0,
       y: 0,
@@ -53,7 +49,7 @@ export class EngineParticleEffect implements IGameObject {
   render() {
     this.sprite.render();
   }
-  update(dt: number): void {
+  update(dt) {
     this.sprite.update(dt);
   }
 }

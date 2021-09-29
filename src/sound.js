@@ -1,8 +1,8 @@
 import { zzfx, zzfxP, zzfxM, zzfxX} from './zzfx';
 
-let myAudioNode: AudioBufferSourceNode = null;
+let myAudioNode = null;
 let isPlaying = false;
-let audioContext: AudioContext = zzfxX;
+let audioContext = zzfxX;
 export const playDead = () => {
   zzfx(...[1.1,,229,,,.31,4,2.38,-0.7,-3,,,,.4,,.2,,.88,.01]); // Hit 111
 };

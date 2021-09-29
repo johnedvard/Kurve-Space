@@ -1,6 +1,6 @@
 
 ## front end
-/node_modules
+/**/node_modules
 /dist/*
 
 ## back end
@@ -9,4 +9,3 @@
 
 ## misc
 .DS_Store
-/kontra

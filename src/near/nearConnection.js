@@ -2,13 +2,13 @@ import { connect, Contract, keyStores, WalletConnection } from 'near-api-js';
 import getConfig from './config';
 
 export class NearConnection {
-  walletConnection: WalletConnection;
-  contract: Contract;
-  accountId: string;
-  private userName: string;
-  ready: Promise<void>;
+  walletConnection;
+  contract;
+  accountId;
+  userName;
+  ready;
   nearConfig = getConfig('development');
-  resolveContract: (value: void | PromiseLike<void>) => void;
+  resolveContract;
   constructor() {
     this.ready = new Promise((resolve, reject) => {
       this.resolveContract = resolve;
@@ -56,25 +56,25 @@ export class NearConnection {
     this.walletConnection.requestSignIn(this.nearConfig.contractName);
   }
 
-  setScore(levelName: string, score: string, name: string): Promise<any> {
+  setScore(levelName, score, name) {
     const json = JSON.stringify({ score, name });
-    return (<any>this.contract).setScore({
+    return this.contract.setScore({
       levelName,
       json,
     });
   }
 
-  getScores(levelName: string) {
-    const scoreBoard = (<any>this.contract).getScores({ levelName });
+  getScores(levelName) {
+    const scoreBoard = this.contract.getScores({ levelName });
     return scoreBoard;
   }
 
-  getScore(levelName: string): Promise<any> {
+  getScore(levelName) {
     const accountId = this.accountId;
-    return (<any>this.contract).getScore({ levelName, accountId });
+    return this.contract.getScore({ levelName, accountId });
   }
 
-  setName(name: string): Promise<void> {
+  setName(name) {
     if (
       name &&
       name != this.userName &&
@@ -82,20 +82,20 @@ export class NearConnection {
       this.walletConnection.isSignedIn()
     ) {
       this.userName = name;
-      return (<any>this.contract).setName({ name });
+      return this.contract.setName({ name });
     }
     return Promise.resolve();
   }
 
-  async getName(): Promise<any> {
+  async getName() {
     if (this.userName) {
       return Promise.resolve(this.userName);
     }
     const accountId = this.accountId;
     return new Promise((resolve, reject) => {
-      (<any>this.contract)
+      this.contract
         .getName({ accountId })
-        .then((res: string) => {
+        .then((res) => {
           if (res && res.match(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g)) {
             this.userName = 'Invalid username';
           } else {
@@ -103,7 +103,7 @@ export class NearConnection {
           }
           resolve(res);
         })
-        .catch((err: any) => {
+        .catch((err) => {
           reject(err);
         });
     });

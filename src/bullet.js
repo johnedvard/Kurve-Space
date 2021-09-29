@@ -1,38 +1,22 @@
-import { Sprite, Vector } from '../kontra/kontra';
-import { on } from '../kontra/src/events';
-import KontraSprite from '../kontra/src/sprite';
-import KontraVector from '../kontra/src/vector';
+import { Sprite, Vector, on } from 'kontra';
 import { BulletState } from './BulletState';
-import { Game } from './game';
 import { GameEvent } from './gameEvent';
 import { isOutOfBounds } from './gameUtils';
-import { IGameObject } from './iGameobject';
 import { playBulletExplotion } from './sound';
 import { checkLineIntersection } from './trails';
 
-export class Bullet implements IGameObject {
-  sprite: Sprite;
+export class Bullet {
+  sprite;
   speed = 300;
-  prevPoint: Vector;
+  prevPoint;
   explotionSize = 40;
   startOffset = 20;
-  bulletState: BulletState = BulletState.idle;
-  constructor(
-    private game: Game,
-    {
-      x,
-      y,
-      rotation,
-      color,
-    }: {
-      x: number;
-      y: number;
-      rotation: number;
-      color: string;
-    }
-  ) {
+  bulletState = BulletState.idle;
+  game;
+  constructor(game, { x, y, rotation, color }) {
+    this.game = game;
     const bullet = this;
-    const kontraSprite: any = KontraSprite({
+    const kontraSprite = Sprite({
       x: x + Math.cos(rotation) * this.startOffset,
       y: y + Math.sin(rotation) * this.startOffset,
       width: 10,
@@ -42,17 +26,17 @@ export class Bullet implements IGameObject {
       dx: this.speed,
       dy: this.speed,
       rotation: rotation,
-      update: function (dt: number) {
+      update: function (dt) {
         if (bullet.bulletState === BulletState.dead) return;
-        bullet.prevPoint = KontraVector(this.x, this.y);
+        bullet.prevPoint = Vector(this.x, this.y);
         this.x = this.x + this.dx * dt * Math.cos(this.rotation);
         this.y = this.y + this.dy * dt * Math.sin(this.rotation);
       },
     });
     this.sprite = kontraSprite;
-    on(GameEvent.hitTrail, (evt: any) => this.onBulletHitTrail(evt));
+    on(GameEvent.hitTrail, (evt) => this.onBulletHitTrail(evt));
   }
-  onBulletHitTrail(evt: any) {
+  onBulletHitTrail(evt) {
     if (evt.go === this.sprite) {
       this.bulletState = BulletState.explode;
       playBulletExplotion();
@@ -60,7 +44,7 @@ export class Bullet implements IGameObject {
       this.sprite.dy = 0;
     }
   }
-  update(dt: number) {
+  update(dt) {
     if (this.bulletState === BulletState.dead) return;
     this.updateDeadBullet();
     this.checkWallHit();

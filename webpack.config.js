@@ -7,21 +7,18 @@ const CopyPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    client: {
+      import: './src/index.js',
+      filename: 'dist/bundle.js',
+    },
+  },
   mode: 'production',
   devtool: 'inline-source-map',
   externals: {
     'near-api-js': 'nearApi',
   },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
+
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Kurve Space',
@@ -45,13 +42,6 @@ module.exports = {
     fallback: {
       path: require.resolve('path-browserify'),
     },
-    alias: {
-      kontra: path.resolve(__dirname, 'kontra'),
-    },
-  },
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
@@ -62,17 +52,17 @@ module.exports = {
     usedExports: true,
     minimizer: [
       // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-      `...`,
-      new JsonMinimizerPlugin(),
-      new HtmlMinimizerPlugin({
-        test: /\.html/i,
-      }),
-      new CssMinimizerPlugin({
-        test: /\.css$/i,
-      }),
-      new UglifyJsPlugin({
-        test: /\.js(\?.*)?$/i,
-      }),
+      // `...`,
+      // new JsonMinimizerPlugin(),
+      // new HtmlMinimizerPlugin({
+      //   test: /\.html/i,
+      // }),
+      // new CssMinimizerPlugin({
+      //   test: /\.css$/i,
+      // }),
+      // new UglifyJsPlugin({
+      //   test: /\.js(\?.*)?$/i,
+      // }),
     ],
   },
 };

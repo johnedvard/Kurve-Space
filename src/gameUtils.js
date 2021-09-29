@@ -1,13 +1,6 @@
-import { Vector, Sprite } from '../kontra/kontra';
-import KontraVector from '../kontra/src/vector';
-import { Game } from './game';
+import { Vector } from 'kontra';
 
-export const lineIntersection = (
-  p1: Vector,
-  p2: Vector,
-  p3: Vector,
-  p4: Vector
-): Vector => {
+export const lineIntersection = (p1, p2, p3, p4) => {
   const d = (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
   if (d == 0) return null; // parallel lines
   const u = ((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d;
@@ -16,17 +9,17 @@ export const lineIntersection = (
   if (v < 0.0 || v > 1.0) return null; // intersection point not between p3 and p4
   const intersectionX = p1.x + u * (p2.x - p1.x);
   const intersectionY = p1.y + u * (p2.y - p1.y);
-  let intersection: Vector = KontraVector(intersectionX, intersectionY);
+  let intersection = Vector(intersectionX, intersectionY);
   return intersection;
 };
 
 //Returns bool, whether the projected point is actually inside the (finite) line segment.
-export const isPointOnLine = (p1: Vector, p2: Vector, p3: Vector): boolean => {
+export const isPointOnLine = (p1, p2, p3) => {
   if (p1.distance && p2.distance && p3.distance)
     return p1.distance(p3) + p2.distance(p3) === p1.distance(p2);
   return false;
 };
-export const isOutOfBounds = (game: Game, go: Sprite): boolean => {
+export const isOutOfBounds = (game, go) => {
   return (
     go.x <= 0 ||
     go.x >= game.canvas.width ||
@@ -35,7 +28,7 @@ export const isOutOfBounds = (game: Game, go: Sprite): boolean => {
   );
 };
 
-export const createColorFromName = (name: string) => {
+export const createColorFromName = (name) => {
   let color = '000000';
   for (let i = 0; i < name.length; i++) {
     try {
@@ -49,11 +42,11 @@ export const createColorFromName = (name: string) => {
   return color;
 };
 
-export const getRandomPos = (widthOrHeight: number) => {
+export const getRandomPos = (widthOrHeight) => {
   return 80 + Math.random() * (widthOrHeight - 160);
 };
 
-export const getPlayerControls = (playerId: number): string[] => {
+export const getPlayerControls = (playerId) => {
   let leftKey = 'left';
   let rightKey = 'right';
   let weaponKey = 'up';

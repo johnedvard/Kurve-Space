@@ -1,13 +1,13 @@
-import { Sprite } from '../kontra/kontra';
+import { Sprite } from 'kontra';
 
-let spriteShipImg: HTMLImageElement;
-let spriteShipImg2: HTMLImageElement;
-const spriteShips: { [key: string]: HTMLImageElement } = {
+let spriteShipImg;
+let spriteShipImg2;
+const spriteShips = {
   spaceship: spriteShipImg,
   spaceship2: spriteShipImg2,
 };
 
-const renderXmark = (sprite: Sprite, isSubscriber = false) => {
+const renderXmark = (sprite, isSubscriber = false) => {
   if (isSubscriber) return;
   sprite.context.strokeStyle = '#ff454555';
   sprite.context.lineWidth = 4;
@@ -27,7 +27,7 @@ const renderXmark = (sprite: Sprite, isSubscriber = false) => {
   sprite.context.stroke();
 };
 export const renderDefaultSpaceShip = (
-  sprite: Sprite,
+  sprite,
   isSubscriber = false,
   isHollow = false
 ) => {
@@ -49,7 +49,7 @@ export const renderDefaultSpaceShip = (
 };
 
 export const renderSpriteShip = (
-  sprite: Sprite,
+  sprite,
   isSubscriber = false,
   name = 'spaceship'
 ) => {
@@ -74,7 +74,7 @@ export const renderSpriteShip = (
 };
 
 export const renderCoolDefaultSpaceShip = (
-  sprite: Sprite,
+  sprite,
   isSubscriber = false,
   isHollow = false
 ) => {
@@ -97,15 +97,13 @@ export const renderCoolDefaultSpaceShip = (
   renderXmark(sprite, isSubscriber);
 };
 
-export const spaceShipRenderers: any[] = [
+export const spaceShipRenderers = [
   renderDefaultSpaceShip,
   renderCoolDefaultSpaceShip,
-  (sprite: Sprite, isSubscriber: boolean) =>
-    renderDefaultSpaceShip(sprite, isSubscriber, true),
-  (sprite: Sprite, isSubscriber: boolean) =>
+  (sprite, isSubscriber) => renderDefaultSpaceShip(sprite, isSubscriber, true),
+  (sprite, isSubscriber) =>
     renderCoolDefaultSpaceShip(sprite, isSubscriber, true),
-  (sprite: Sprite, isSubscriber: boolean) =>
-    renderSpriteShip(sprite, isSubscriber, 'spaceship'),
-  (sprite: Sprite, isSubscriber: boolean) =>
+  (sprite, isSubscriber) => renderSpriteShip(sprite, isSubscriber, 'spaceship'),
+  (sprite, isSubscriber) =>
     renderSpriteShip(sprite, isSubscriber, 'spaceship2'),
 ];

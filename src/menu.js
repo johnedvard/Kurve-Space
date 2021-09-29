@@ -1,20 +1,20 @@
 import { Game } from './game';
 import { IGameObject } from './iGameobject';
-import { Sprite } from '../kontra/kontra';
-import { emit, on } from '../kontra/src/events';
+import { Sprite, emit, on } from 'kontra';
 import { createColorFromName, getPlayerControls } from './gameUtils';
 import { GameEvent } from './gameEvent';
 import { SpaceShip } from './spaceShip';
 import { PlayerState } from './playerState';
 import { MonetizeEvent } from './monetizeEvent';
 
-export class Menu implements IGameObject {
-  sprite: Sprite;
-  spaceShips: SpaceShip[];
-  menuEl: HTMLElement;
-  spaceDesc: HTMLElement;
-  userName: string;
-  constructor(private game: Game, scale: number) {
+export class Menu {
+  sprite;
+  spaceShips;
+  menuEl;
+  spaceDesc;
+  userName;
+  constructor(game, scale) {
+    this.game = game;
     const offset = 130;
     const gap = 355;
     this.spaceShips = [...Array(game.maxPlayers).keys()].map((id) => {
@@ -67,13 +67,13 @@ export class Menu implements IGameObject {
     on(MonetizeEvent.progress, () => this.onMonetizeProgress());
     window.addEventListener(
       'drand',
-      (e: any) => {
+      (e) => {
         this.setNewPlayerNames(e.detail);
       },
       false
     );
   }
-  setNewPlayerNames(colorNames: string[]) {
+  setNewPlayerNames(colorNames) {
     this.spaceShips.forEach((ship, index) => {
       // ignore player 1
       if (index > 0) {
@@ -82,7 +82,7 @@ export class Menu implements IGameObject {
     });
   }
   initSpaceshipSelectionUi() {
-    const arrowGroupEl: HTMLElement = document.getElementById('arrowGroup');
+    const arrowGroupEl = document.getElementById('arrowGroup');
     arrowGroupEl.addEventListener('click', (evt) => this.onArrowClicked(evt));
     for (let i = 0; i < this.game.maxPlayers; i++) {
       const leftArrow = document.createElement('button');
@@ -95,8 +95,8 @@ export class Menu implements IGameObject {
       arrowGroupEl.appendChild(rightArrow);
     }
   }
-  onArrowClicked(evt: Event) {
-    const target: HTMLElement = <HTMLElement>evt.target;
+  onArrowClicked(evt) {
+    const target = evt.target;
     const idAttr = target.getAttribute('id');
     if (idAttr.match('rightArrow-') || idAttr.match('leftArrow-')) {
       const next = idAttr.match('leftArrow') ? 1 : -1;
@@ -112,7 +112,7 @@ export class Menu implements IGameObject {
         'Thanks for being a Coil subscriber  &#128081; You can select any space ship';
     }
   }
-  selectSpaceShip(spaceShipId: number, next: number) {
+  selectSpaceShip(spaceShipId, next) {
     let newSpaceShipIndex = this.spaceShips[spaceShipId].spaceshipIndex + next;
     if (newSpaceShipIndex < 0) {
       newSpaceShipIndex = this.spaceShips[spaceShipId].ships.length - 1;
@@ -121,7 +121,7 @@ export class Menu implements IGameObject {
     }
     this.spaceShips[spaceShipId].spaceshipIndex = newSpaceShipIndex;
   }
-  setSubscriptionTextVisibility(show: boolean) {
+  setSubscriptionTextVisibility(show) {
     this.spaceDesc = this.spaceDesc || document.getElementById('spaceDesc');
     if (show) {
       this.spaceDesc.classList.remove('hide');
@@ -138,24 +138,24 @@ export class Menu implements IGameObject {
       this.menuEl.classList.remove('in');
     }
   }
-  update(dt: number): void {
+  update(dt) {
     this.spaceShips.forEach((ship) => {
       ship.sprite.update(dt);
     });
   }
-  render(): void {
+  render() {
     this.spaceShips.forEach((ship) => {
       ship.sprite.render();
     });
   }
-  nameChange(event: any) {
+  nameChange(event) {
     this.userName = event.target.value;
     this.setColorFromName(this.userName);
   }
-  setColorFromName(name: string) {
+  setColorFromName(name) {
     this.spaceShips[0].sprite.color = '#' + createColorFromName(name);
   }
-  async setUserName(nameEl: HTMLElement) {
+  async setUserName(nameEl) {
     await this.game.nearConnection.ready;
     this.userName = await this.game.nearConnection.getName();
     nameEl.setAttribute('value', this.userName);

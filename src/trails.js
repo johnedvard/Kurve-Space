@@ -1,26 +1,23 @@
-import { Sprite, Vector } from '../kontra/kontra';
-import { emit } from '../kontra/src/events';
-import KontraVector from '../kontra/src/vector';
+import { Vector, emit } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { lineIntersection } from './gameUtils';
-import { Player } from './player';
 
 // TODO (johnedvard) don't hardcode players
-const players: Player[] = [null, null, null, null];
-export const playerTrails: Vector[][][] = [[[]], [[]], [[]], [[]]]; // playerIds with a list of line segments.
+const players = [null, null, null, null];
+export const playerTrails = [[[]], [[]], [[]], [[]]]; // playerIds with a list of line segments.
 /**
  * Used to add the player's latest position to the trail before checking intersection
  */
-export const addPlayer = (player: Player) => {
+export const addPlayer = (player) => {
   players[player.playerId] = player;
 };
 /**
  * Check if player hits any trail
  */
-export const checkLineIntersection = (goPoint: Vector, go: Sprite) => {
+export const checkLineIntersection = (goPoint, go) => {
   if (!goPoint || !go) return;
   const lastPoint = goPoint;
-  const lastPoint2 = KontraVector(go.x, go.y);
+  const lastPoint2 = Vector(go.x, go.y);
 
   playerTrails.forEach((trails, playerId) => {
     trails.forEach((lineSegment, segmentIndex) => {
@@ -31,7 +28,7 @@ export const checkLineIntersection = (goPoint: Vector, go: Sprite) => {
       ) {
         // Add player pos if last line segment
         points.push(
-          KontraVector(players[playerId].sprite.x, players[playerId].sprite.y)
+          Vector(players[playerId].sprite.x, players[playerId].sprite.y)
         );
       }
       for (let i = 0; i < points.length - 1; i++) {
@@ -53,7 +50,7 @@ export const checkLineIntersection = (goPoint: Vector, go: Sprite) => {
             emit(GameEvent.hitTrail, {
               point: intersection,
               go,
-              playerId: playerId,
+              playerId,
               trailIndex: i,
               segmentIndex,
             });

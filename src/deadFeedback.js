@@ -1,21 +1,16 @@
-import { Sprite } from '../kontra/kontra';
-import { on } from '../kontra/src/events';
-import { Game } from './game';
+import { on } from 'kontra';
 import { GameEvent } from './gameEvent';
-import { IGameObject } from './iGameobject';
 import { PlayerState } from './playerState';
 import { playDead } from './sound';
-import { SpaceShip } from './spaceShip';
 
-export class DeadFeedback implements IGameObject {
-  sprite: Sprite;
+export class DeadFeedback {
   isRender = false;
-  constructor(private game: Game) {
-    on(GameEvent.playerStateChange, (evt: any) =>
-      this.onPlayerStateChange(evt)
-    );
+  game;
+  constructor(game) {
+    this.game = game;
+    on(GameEvent.playerStateChange, (evt) => this.onPlayerStateChange(evt));
   }
-  onPlayerStateChange(evt: { state: PlayerState; ship: SpaceShip }) {
+  onPlayerStateChange(evt) {
     if (evt.state === PlayerState.dead) {
       playDead();
       this.isRender = true;
@@ -24,7 +19,7 @@ export class DeadFeedback implements IGameObject {
       }, 90);
     }
   }
-  update(dt: number) {}
+  update(dt) {}
   render() {
     if (this.isRender) {
       this.game.ctx.fillStyle = 'gray';
