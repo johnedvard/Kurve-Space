@@ -9,7 +9,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
   entry: {
     client: {
-      import: './src/index.js',
+      import: './client/index.js',
       filename: 'dist/bundle.js',
     },
   },
@@ -22,16 +22,16 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Kurve Space',
-      template: path.resolve(__dirname, 'src/index.html'),
+      template: path.resolve(__dirname, 'client/index.html'),
     }),
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src/assets'),
+          from: path.resolve(__dirname, 'client/assets'),
           to: path.resolve(__dirname, 'dist/assets'),
         },
         {
-          from: path.resolve(__dirname, 'src/style.css'),
+          from: path.resolve(__dirname, 'client/style.css'),
           to: path.resolve(__dirname, 'dist/style.css'),
         },
       ],
