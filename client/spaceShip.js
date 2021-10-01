@@ -1,8 +1,8 @@
 import { Sprite, on, keyPressed } from 'kontra';
-import { GameEvent } from './gameEvent';
-import { MonetizeEvent } from './monetizeEvent';
-import { PlayerState } from './playerState';
-import { spaceShipRenderers } from './spaceShipRenderers';
+import { GameEvent } from './gameEvent.js';
+import { MonetizeEvent } from './monetizeEvent.js';
+import { PlayerState } from './playerState.js';
+import { spaceShipRenderers } from './spaceShipRenderers.js';
 
 export class SpaceShip {
   sprite;

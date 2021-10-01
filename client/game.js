@@ -7,16 +7,16 @@ import {
   emit,
   on,
 } from 'kontra';
-import { IGameObject } from './iGameobject';
-import { NearConnection } from './near/nearConnection';
-import { initLoginLogout } from './near/nearLogin';
-import { Player } from './player';
-import { Menu } from './menu';
-import { GameEvent } from './gameEvent';
-import { createColorFromName } from './gameUtils';
-import { PlayerState } from './playerState';
-import { DeadFeedback } from './deadFeedback';
-import { playSong, toggleSond } from './sound';
+import { NearConnection } from './near/nearConnection.js';
+import { initLoginLogout } from './near/nearLogin.js';
+import { Player } from './player.js';
+import { Menu } from './menu.js';
+import { GameEvent } from './gameEvent.js';
+import { createColorFromName } from './gameUtils.js';
+import { PlayerState } from './playerState.js';
+import { DeadFeedback } from './deadFeedback.js';
+import { playSong, toggleSound } from './sound.js';
+import { io } from 'socket.io-client';
 
 export class Game {
   canvas;
@@ -57,6 +57,11 @@ export class Game {
       },
       false
     );
+
+    const socket = io('http://localhost:3000/', {
+      reconnectionDelayMax: 10000,
+      
+    });
   }
   setNewPlayerNames(colorNames) {
     colorNames.forEach((cn, index) => {
@@ -83,7 +88,7 @@ export class Game {
     bindKeys(
       'm',
       (e) => {
-        toggleSond();
+        toggleSound();
       },
       { handler: 'keyup' }
     );
@@ -146,7 +151,7 @@ export class Game {
       .catch(() => {
         this.setPlayerColor('No_Name');
       });
-    playSong();
+    playSong(true); // load assets
   }
   setPlayerColor(name) {
     if (this.players && this.players[0]) {

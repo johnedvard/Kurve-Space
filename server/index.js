@@ -10,7 +10,10 @@ app.get('/', (req, res) => {
 });
 
 const io = new Server(httpServer, {
-  /* options */
+  cors: {
+    origin: "http://localhost:9000",
+    methods: ["GET", "POST"]
+  }
 });
 
 io.on('connection', (socket) => {
@@ -18,4 +21,4 @@ io.on('connection', (socket) => {
 });
 
 httpServer.listen(3000);
-console.log('listen', test);
+console.log('listen asd', test);

@@ -1,11 +1,11 @@
-import { Game } from './game';
-import { IGameObject } from './iGameobject';
+import { Game } from './game.js';
+import { IGameObject } from './iGameobject.js';
 import { Sprite, emit, on } from 'kontra';
-import { createColorFromName, getPlayerControls } from './gameUtils';
-import { GameEvent } from './gameEvent';
-import { SpaceShip } from './spaceShip';
-import { PlayerState } from './playerState';
-import { MonetizeEvent } from './monetizeEvent';
+import { createColorFromName, getPlayerControls } from './gameUtils.js';
+import { GameEvent } from './gameEvent.js';
+import { SpaceShip } from './spaceShip.js';
+import { PlayerState } from './playerState.js';
+import { MonetizeEvent } from './monetizeEvent.js';
 
 export class Menu {
   sprite;

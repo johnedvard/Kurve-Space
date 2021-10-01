@@ -1,7 +1,7 @@
 import { on } from 'kontra';
-import { GameEvent } from './gameEvent';
-import { PlayerState } from './playerState';
-import { playDead } from './sound';
+import { GameEvent } from './gameEvent.js';
+import { PlayerState } from './playerState.js';
+import { playDead } from './sound.js';
 
 export class DeadFeedback {
   isRender = false;

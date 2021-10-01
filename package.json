@@ -4,8 +4,10 @@
   "version": "1.0.0",
   "description": "Multiplayer version of Kurve Space",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "webpack serve",
+    "start:server": "nodemon server/index.js",
     "build:zip": "zip dist/game.zip -r dist/index.html dist/bundle.js dist/style.css dist/assets",
     "build": "webpack && npm run build:zip",
     "build:roadroller": "webpack && roadroller dist/bundle.js -o dist/bundle.js && npm run build:zip",

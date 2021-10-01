@@ -1,12 +1,12 @@
 import { emit, on, Vector, bindKeys } from 'kontra';
-import { PlayerState } from './playerState';
-import { GameEvent } from './gameEvent';
-import { getPlayerControls, getRandomPos, isOutOfBounds } from './gameUtils';
-import { SpaceShip } from './spaceShip';
-import { MonetizeEvent } from './monetizeEvent';
-import { EngineParticleEffect } from './engineParticleEffect';
-import { addPlayer, checkLineIntersection, playerTrails } from './trails';
-import { Bullet } from './bullet';
+import { PlayerState } from './playerState.js';
+import { GameEvent } from './gameEvent.js';
+import { getPlayerControls, getRandomPos, isOutOfBounds } from './gameUtils.js';
+import { SpaceShip } from './spaceShip.js';
+import { MonetizeEvent } from './monetizeEvent.js';
+import { EngineParticleEffect } from './engineParticleEffect.js';
+import { addPlayer, checkLineIntersection, playerTrails } from './trails.js';
+import { Bullet } from './bullet.js';
 
 class Player {
   sprite;

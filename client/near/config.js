@@ -1,6 +1,6 @@
 const CONTRACT_NAME = 'dev-1618829854588-2430734';
 
-function getConfig(env) {
+export function getConfig(env) {
   switch (env) {
     // case 'production':
     // case 'mainnet':
@@ -60,4 +60,3 @@ function getConfig(env) {
     //   );
   }
 }
-module.exports = getConfig;

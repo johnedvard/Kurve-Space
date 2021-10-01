@@ -1,5 +1,5 @@
 import { connect, Contract, keyStores, WalletConnection } from 'near-api-js';
-import getConfig from './config';
+import {getConfig} from './config.js';
 
 export class NearConnection {
   walletConnection;

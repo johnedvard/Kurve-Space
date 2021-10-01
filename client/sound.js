@@ -1,4 +1,4 @@
-import { zzfx, zzfxP, zzfxM, zzfxX} from './zzfx';
+import { zzfx, zzfxP, zzfxM, zzfxX} from './zzfx.js';
 
 let myAudioNode = null;
 let isPlaying = false;
@@ -9,7 +9,7 @@ export const playDead = () => {
 export const playBulletExplotion = () => {
   zzfx(...[1.75,,334,,.13,.98,4,.79,.9,,,,,.9,,.4,.29,.84,.01,.49]); // Explosion 121
 }
-export const playSong = () => {
+export const playSong = (firstRun = false) => {
   isPlaying = true;
   if(myAudioNode){
     audioContext.resume();
@@ -20,6 +20,7 @@ export const playSong = () => {
   
   myAudioNode = zzfxP(...mySongData);
   myAudioNode.loop = true;
+  if(firstRun) stopSong();
   return;
 }
 
@@ -27,7 +28,7 @@ export const stopSong = () => {
   isPlaying = false;
   audioContext.suspend();
 }
-export const toggleSond = () => {
+export const toggleSound = () => {
   if(isPlaying){
     stopSong();
   } else{

@@ -1,6 +1,6 @@
 import { emit } from 'kontra';
-import { Game } from './game';
-import { MonetizeEvent } from './monetizeEvent';
+import { Game } from './game.js';
+import { MonetizeEvent } from './monetizeEvent.js';
 
 const monetizeExample = () => {
   if (document && document.monetization) {

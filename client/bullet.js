@@ -1,9 +1,9 @@
 import { Sprite, Vector, on } from 'kontra';
-import { BulletState } from './BulletState';
-import { GameEvent } from './gameEvent';
-import { isOutOfBounds } from './gameUtils';
-import { playBulletExplotion } from './sound';
-import { checkLineIntersection } from './trails';
+import { BulletState } from './bulletState.js';
+import { GameEvent } from './gameEvent.js';
+import { isOutOfBounds } from './gameUtils.js';
+import { playBulletExplotion } from './sound.js';
+import { checkLineIntersection } from './trails.js';
 
 export class Bullet {
   sprite;

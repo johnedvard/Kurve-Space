@@ -1,6 +1,6 @@
 import { Vector, emit } from 'kontra';
-import { GameEvent } from './gameEvent';
-import { lineIntersection } from './gameUtils';
+import { GameEvent } from './gameEvent.js';
+import { lineIntersection } from './gameUtils.js';
 
 // TODO (johnedvard) don't hardcode players
 const players = [null, null, null, null];
