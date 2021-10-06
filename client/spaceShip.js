@@ -13,11 +13,9 @@ export class SpaceShip {
   ships = [...spaceShipRenderers];
   rotating = false;
   isSubscriber = false;
-  game;
   props;
   playerState;
-  constructor(game, playerState, props) {
-    this.game = game;
+  constructor(playerState, props) {
     this.props = props;
     this.playerState = playerState;
     this.rightKey = props.rightKey || this.rightKey;
@@ -68,7 +66,7 @@ export class SpaceShip {
 
   renderSpaceShip(sprite, isSubscriber = false) {
     if (this.playerState !== PlayerState.dead) {
-      spaceShipRenderers[this.spaceshipIndex](sprite, isSubscriber);
+      spaceShipRenderers[0](sprite, isSubscriber);
     }
   }
 }

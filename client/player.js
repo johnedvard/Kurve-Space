@@ -37,12 +37,12 @@ class Player {
     this.getEndTrail();
     this.ctx = this.game.ctx;
     const spriteProps = {
-      x: getRandomPos(this.game.canvasWidth * this.game.scale),
-      y: getRandomPos(this.game.canvasHeight * this.game.scale),
+      x: playerProps.x,
+      y: playerProps.y,
       color: this.playerProps.color || '#000',
     };
     const [leftKey, rightKey, weaponKey] = getPlayerControls(this.playerId);
-    this.spaceShip = new SpaceShip(this.game, this.playerState, {
+    this.spaceShip = new SpaceShip(this.playerState, {
       scale: this.scale,
       spriteProps,
       isPreview: false,
@@ -258,6 +258,12 @@ class Player {
     this.spaceShip.sprite.y = getRandomPos(
       this.game.canvasHeight * this.game.scale
     );
+  }
+  get x() {
+    return this.sprite.x;
+  }
+  get y() {
+    return this.sprite.y;
   }
 }
 export { Player };

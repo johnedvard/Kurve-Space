@@ -1,11 +1,9 @@
-import { Game } from './game.js';
-import { IGameObject } from './iGameobject.js';
-import { Sprite, emit, on } from 'kontra';
-import { createColorFromName, getPlayerControls } from './gameUtils.js';
+import { on, emit, Button, Grid } from 'kontra';
 import { GameEvent } from './gameEvent.js';
+import { MonetizeEvent } from './monetizeEvent.js';
+import { createColorFromName, getPlayerControls } from './gameUtils.js';
 import { SpaceShip } from './spaceShip.js';
 import { PlayerState } from './playerState.js';
-import { MonetizeEvent } from './monetizeEvent.js';
 
 export class Menu {
   sprite;
@@ -13,21 +11,18 @@ export class Menu {
   menuEl;
   spaceDesc;
   userName;
+  grid;
+  gos = [];
   constructor(game, scale) {
     this.game = game;
-    const offset = 130;
-    const gap = 355;
-    this.spaceShips = [...Array(game.maxPlayers).keys()].map((id) => {
+    this.spaceShips = [0].map((id) => {
       const spriteProps = {
-        x: this.game.canvas.width / 4 + gap * id - offset,
+        x: this.game.canvas.width / 2,
         y: window.innerHeight / 2,
-        color:
-          id > 0
-            ? '#' + createColorFromName(game.extraPlayerNames[id - 1])
-            : '',
+        color: '#' + createColorFromName('no_name'),
       };
       const [leftKey, rightKey, weaponKey] = getPlayerControls(id);
-      return new SpaceShip(this.game, PlayerState.idle, {
+      return new SpaceShip(PlayerState.idle, {
         scale: scale || 1,
         spriteProps: { ...spriteProps },
         isPreview: true,
@@ -36,82 +31,75 @@ export class Menu {
         weaponKey,
       });
     });
-    this.menuEl = document.getElementById('menu');
+    this.gos.push(...this.spaceShips);
+    this.initGrid(this);
+    on(MonetizeEvent.progress, this.onMonetizeProgress);
+  }
 
-    const nameEl = document.getElementById('name');
-    nameEl.addEventListener('keyup', (ev) => this.nameChange(ev));
-    this.setUserName(nameEl);
+  initGrid(menu) {
+    const startGame = this.initStartGameButton(menu);
+    const loginOutBtn = this.initLoginLogoutButton(menu);
+    const grid = Grid({
+      x: this.game.canvas.width / 2,
+      y: this.game.canvas.height - 200,
+      anchor: { x: 0.5, y: 0.5 },
 
-    const startgameEl = document.getElementById('startgame');
-    startgameEl.addEventListener('click', (ev) => {
-      startgameEl.classList.add('loading');
-      startgameEl.innerHTML = 'Loading...';
-      startgameEl.setAttribute('disabled', 'true');
-      setTimeout(() => {
-        // tick to update UI first
-        this.game.nearConnection.ready.then(() => {
-          this.game.nearConnection.setName(this.userName);
-          emit(GameEvent.startGame, {
-            spaceShipRenderIndices: this.spaceShips.map((ship) => {
-              return ship.spaceshipIndex;
-            }),
-            userName: this.userName,
-          });
-          this.menuEl.classList.add('out');
-        });
-      }, 50);
+      // add 15 pixels of space between each row
+      rowGap: 15,
+
+      // center the children
+      justify: 'center',
+
+      children: [startGame],
     });
+    this.gos.push({ sprite: grid });
+  }
+  initLoginLogoutButton(menu) {
+    const button = Button({
+      // sprite properties
+      anchor: { x: 0.5, y: 0.5 },
 
-    this.setSubscriptionTextVisibility(true);
-    this.initSpaceshipSelectionUi();
-    on(MonetizeEvent.progress, () => this.onMonetizeProgress());
-    window.addEventListener(
-      'drand',
-      (e) => {
-        this.setNewPlayerNames(e.detail);
+      // text properties
+      text: {
+        text: 'Login',
+        color: 'white',
+        font: '40px Arial, sans-serif',
+        anchor: { x: 0.5, y: 0.5 },
       },
-      false
-    );
-  }
-  setNewPlayerNames(colorNames) {
-    this.spaceShips.forEach((ship, index) => {
-      // ignore player 1
-      if (index > 0) {
-        ship.sprite.color = '#' + createColorFromName(colorNames[index - 1]);
-      }
+
+      // button properties
+      padX: 20,
+      padY: 10,
     });
+    return button;
   }
-  initSpaceshipSelectionUi() {
-    const arrowGroupEl = document.getElementById('arrowGroup');
-    arrowGroupEl.addEventListener('click', (evt) => this.onArrowClicked(evt));
-    for (let i = 0; i < this.game.maxPlayers; i++) {
-      const leftArrow = document.createElement('button');
-      leftArrow.setAttribute('id', 'leftArrow-' + i);
-      leftArrow.innerHTML = '<';
-      const rightArrow = document.createElement('button');
-      rightArrow.setAttribute('id', 'rightArrow-' + i);
-      rightArrow.innerHTML = '>';
-      arrowGroupEl.appendChild(leftArrow);
-      arrowGroupEl.appendChild(rightArrow);
-    }
+
+  initStartGameButton(menu) {
+    const button = Button({
+      id: 'startGame',
+      anchor: { x: 0.5, y: 0.5 },
+      text: {
+        text: 'Start Game',
+        color: 'white',
+        font: '40px Arial, sans-serif',
+        anchor: { x: 0.5, y: 0.5 },
+      },
+      padX: 20,
+      padY: 10,
+      onUp() {
+        emit(GameEvent.findGame, {
+          spaceShipRenderIndices: menu.spaceShips.map((ship) => {
+            return ship.spaceshipIndex;
+          }),
+          userName: this.userName,
+        });
+      },
+    });
+    return button;
   }
-  onArrowClicked(evt) {
-    const target = evt.target;
-    const idAttr = target.getAttribute('id');
-    if (idAttr.match('rightArrow-') || idAttr.match('leftArrow-')) {
-      const next = idAttr.match('leftArrow') ? 1 : -1;
-      const playerId = parseInt(idAttr.split('-')[1], 10);
-      this.selectSpaceShip(playerId, next);
-    }
-  }
-  onMonetizeProgress() {
-    this.spaceDesc = this.spaceDesc || document.getElementById('spaceDesc');
-    if (!this.spaceDesc.classList.contains('subscriber')) {
-      this.spaceDesc.classList.add('subscriber');
-      this.spaceDesc.innerHTML =
-        'Thanks for being a Coil subscriber  &#128081; You can select any space ship';
-    }
-  }
+  initSpaceshipSelectionUi() {}
+  onArrowClicked(evt) {}
+  onMonetizeProgress(evt) {}
   selectSpaceShip(spaceShipId, next) {
     let newSpaceShipIndex = this.spaceShips[spaceShipId].spaceshipIndex + next;
     if (newSpaceShipIndex < 0) {
@@ -121,14 +109,7 @@ export class Menu {
     }
     this.spaceShips[spaceShipId].spaceshipIndex = newSpaceShipIndex;
   }
-  setSubscriptionTextVisibility(show) {
-    this.spaceDesc = this.spaceDesc || document.getElementById('spaceDesc');
-    if (show) {
-      this.spaceDesc.classList.remove('hide');
-    } else {
-      this.spaceDesc.classList.add('hide');
-    }
-  }
+
   toggleMenu() {
     if (this.menuEl.classList.contains('out')) {
       this.menuEl.classList.add('in');
@@ -139,26 +120,17 @@ export class Menu {
     }
   }
   update(dt) {
-    this.spaceShips.forEach((ship) => {
-      ship.sprite.update(dt);
+    this.gos.forEach((go) => {
+      if (go.sprite) {
+        go.sprite.update(dt);
+      }
     });
   }
   render() {
-    this.spaceShips.forEach((ship) => {
-      ship.sprite.render();
+    this.gos.forEach((go) => {
+      if (go.sprite) {
+        go.sprite.render();
+      }
     });
-  }
-  nameChange(event) {
-    this.userName = event.target.value;
-    this.setColorFromName(this.userName);
-  }
-  setColorFromName(name) {
-    this.spaceShips[0].sprite.color = '#' + createColorFromName(name);
-  }
-  async setUserName(nameEl) {
-    await this.game.nearConnection.ready;
-    this.userName = await this.game.nearConnection.getName();
-    nameEl.setAttribute('value', this.userName);
-    this.setColorFromName(this.userName);
   }
 }

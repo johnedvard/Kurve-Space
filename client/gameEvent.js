@@ -8,4 +8,5 @@ export const GameEvent = {
   newGame: 'ng',
   weaponAttack: 'wa',
   bulletHitTrail: 'bht',
+  findGame: 'fg',
 };

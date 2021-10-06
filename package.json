@@ -4,12 +4,13 @@
   "version": "1.0.0",
   "description": "Multiplayer version of Kurve Space",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "webpack serve",
-    "start:server": "nodemon server/index.js",
+    "start:server": "ts-node server/index.ts",
+    "start:server:dev": "ts-node-dev --watch \"server/**/*\" --respawn --transpile-only server/index.ts ",
     "build:zip": "zip dist/game.zip -r dist/index.html dist/bundle.js dist/style.css dist/assets",
     "build": "webpack && npm run build:zip",
+    "build:server": "tsc server/",
     "build:roadroller": "webpack && roadroller dist/bundle.js -o dist/bundle.js && npm run build:zip",
     "build:kontra": "npm --prefix ./kontra/ run build",
     "near:login": "near login",
@@ -53,6 +54,7 @@
     "style-loader": "^3.2.1",
     "ts-loader": "^9.2.5",
     "ts-node": "^10.2.1",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.5",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^5.50.0",
@@ -60,10 +62,12 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
+    "colyseus.js": "^0.14.13",
     "kontra": "^7.3.1",
     "near-api-js": "^0.42.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "regenerator-runtime": "^0.13.9",
+    "rxjs": "^7.3.1",
     "socket.io-client": "^4.2.0"
   },
   "jest": {

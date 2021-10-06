@@ -12,11 +12,11 @@ import { initLoginLogout } from './near/nearLogin.js';
 import { Player } from './player.js';
 import { Menu } from './menu.js';
 import { GameEvent } from './gameEvent.js';
-import { createColorFromName } from './gameUtils.js';
+import { createColorFromName, getRandomPos } from './gameUtils.js';
 import { PlayerState } from './playerState.js';
 import { DeadFeedback } from './deadFeedback.js';
 import { playSong, toggleSound } from './sound.js';
-import { io } from 'socket.io-client';
+import { ServerConnection } from './serverConnection.js';
 
 export class Game {
   canvas;
@@ -34,6 +34,9 @@ export class Game {
   isGameOver = false;
   isGameStarted = false;
   nearConnection;
+  client;
+  room;
+  serverConnection;
   constructor(canvas) {
     this.initNear();
     this.canvas = canvas;
@@ -48,26 +51,17 @@ export class Game {
     this.initLoop();
     this.handleGameInput();
     this.gos.push(new DeadFeedback(this));
+    on(GameEvent.findGame, (props) => this.onFindGame(props));
     on(GameEvent.startGame, (props) => this.onStartGame(props));
     on(GameEvent.newGame, (props) => this.onNewGame(props));
-    window.addEventListener(
-      'drand',
-      (e) => {
-        this.setNewPlayerNames(e.detail);
-      },
-      false
-    );
-
-    const socket = io('http://localhost:3000/', {
-      reconnectionDelayMax: 10000,
-      
-    });
   }
+
   setNewPlayerNames(colorNames) {
     colorNames.forEach((cn, index) => {
       this.extraPlayerNames[index] = cn;
     });
   }
+
   handleGameInput() {
     bindKeys(
       'space',
@@ -125,33 +119,32 @@ export class Game {
       initLoginLogout(nearConnection);
     });
   }
-  onStartGame(props) {
-    this.isGameStarted = true;
+  onFindGame(props) {
     if (this.gos.includes(this.menu)) {
       this.gos.splice(this.gos.indexOf(this.menu), 1);
     }
-    [...Array(this.maxPlayers).keys()].forEach((id) => {
-      const player = new Player(this, this.scale, {
-        color:
-          id > 0
-            ? '#' + createColorFromName(this.extraPlayerNames[id - 1])
-            : '#' + createColorFromName('No_Name'),
-        isAi: false,
-        spaceShipRenderIndex: props.spaceShipRenderIndices[id],
-        playerId: id,
-      });
-      this.players.push(player);
-      this.gos.push(player);
+    const player = new Player(this, this.scale, {
+      color: '#' + createColorFromName('No_Name'),
+      isAi: false,
+      spaceShipRenderIndex: props.spaceShipRenderIndices[0],
+      playerId: 0,
+      x: getRandomPos(this.canvasWidth * this.scale),
+      y: getRandomPos(this.canvasHeight * this.scale),
     });
-    this.nearConnection
-      .getName()
-      .then((name) => {
-        this.setPlayerColor(name);
-      })
-      .catch(() => {
-        this.setPlayerColor('No_Name');
-      });
+    this.players.push(player);
+    this.gos.push(player);
     playSong(true); // load assets
+    this.serverConnection = new ServerConnection(this, player);
+    this.serverConnection.otherPlayersSub.subscribe((otherPlayers) => {
+      console.log('otherPlayers', otherPlayers);
+      this.players = [player, ...otherPlayers];
+      this.gos.push(...otherPlayers);
+    });
+  }
+  onStartGame() {
+    console.log('client start game');
+    this.players.length = 0;
+    this.isGameStarted = true;
   }
   setPlayerColor(name) {
     if (this.players && this.players[0]) {
