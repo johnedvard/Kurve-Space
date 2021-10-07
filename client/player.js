@@ -5,7 +5,7 @@ import { getPlayerControls, getRandomPos, isOutOfBounds } from './gameUtils.js';
 import { SpaceShip } from './spaceShip.js';
 import { MonetizeEvent } from './monetizeEvent.js';
 import { EngineParticleEffect } from './engineParticleEffect.js';
-import { addPlayer, checkLineIntersection, playerTrails } from './trails.js';
+import { addPlayer, checkLineIntersection, getPlayerTrail } from './trails.js';
 import { Bullet } from './bullet.js';
 
 class Player {
@@ -33,7 +33,7 @@ class Player {
     this.playerId = this.playerProps.playerId;
     this.effect = new EngineParticleEffect();
     this.speed = 100 * this.scale;
-    this.trails = playerTrails[this.playerProps.playerId];
+    this.trails = getPlayerTrail(this.playerId);
     this.getEndTrail();
     this.ctx = this.game.ctx;
     const spriteProps = {
@@ -41,24 +41,27 @@ class Player {
       y: playerProps.y,
       color: this.playerProps.color || '#000',
     };
-    const [leftKey, rightKey, weaponKey] = getPlayerControls(this.playerId);
+    const [leftKey, rightKey, weaponKey] = getPlayerControls();
     this.spaceShip = new SpaceShip(this.playerState, {
       scale: this.scale,
       spriteProps,
       isPreview: false,
+      isOpponent: playerProps.isOpponent,
       rightKey,
       leftKey,
     });
 
-    bindKeys(
-      weaponKey,
-      (e) => {
-        emit(GameEvent.weaponAttack, {
-          sprite: this.spaceShip.sprite,
-        });
-      },
-      { handler: 'keyup' }
-    );
+    if (!playerProps.isOpponent) {
+      bindKeys(
+        weaponKey,
+        (e) => {
+          emit(GameEvent.weaponAttack, {
+            sprite: this.spaceShip.sprite,
+          });
+        },
+        { handler: 'keyup' }
+      );
+    }
 
     on(GameEvent.weaponAttack, (evt) => this.onPayerAttack(evt));
     on(GameEvent.startTrace, () => this.onStartTrace());
@@ -157,6 +160,7 @@ class Player {
       // Add point to prevent alive player from dying right after being hit, but only if not rotating
       this.getEndTrail().push(Vector(this.sprite.x, this.sprite.y));
     }
+    console.log('playerId, this.playerId', playerId, this.playerId);
     if (playerId === this.playerId) {
       this.splitLineSegment({ segmentIndex, trailIndex });
     }

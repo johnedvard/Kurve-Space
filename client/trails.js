@@ -1,16 +1,26 @@
 import { Vector, emit } from 'kontra';
 import { GameEvent } from './gameEvent.js';
 import { lineIntersection } from './gameUtils.js';
+/**
+ * Persistent storage of line segments for
+ */
 
-// TODO (johnedvard) don't hardcode players
-const players = [null, null, null, null];
-export const playerTrails = [[[]], [[]], [[]], [[]]]; // playerIds with a list of line segments.
+/**
+ * @type {[id:string]:Player}
+ */
+const players = {};
+
+/**
+ * @type {[id:string]:[[]]}
+ */
+const playerTrails = {}; // playerIds with a list of line segments.
 /**
  * Used to add the player's latest position to the trail before checking intersection
  */
 export const addPlayer = (player) => {
   players[player.playerId] = player;
 };
+
 /**
  * Check if player hits any trail
  */
@@ -19,7 +29,7 @@ export const checkLineIntersection = (goPoint, go) => {
   const lastPoint = goPoint;
   const lastPoint2 = Vector(go.x, go.y);
 
-  playerTrails.forEach((trails, playerId) => {
+  for (const [playerId, trails] of Object.entries(playerTrails)) {
     trails.forEach((lineSegment, segmentIndex) => {
       const points = [...lineSegment];
       if (
@@ -58,5 +68,13 @@ export const checkLineIntersection = (goPoint, go) => {
         }
       }
     });
-  });
+  }
+};
+
+export const getPlayerTrail = (playerId) => {
+  let trails = playerTrails[playerId];
+  if (!trails) {
+    trails = playerTrails[playerId] = [[]];
+  }
+  return trails;
 };

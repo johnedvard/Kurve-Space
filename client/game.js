@@ -28,8 +28,6 @@ export class Game {
   scale;
   canvasWidth = 800;
   canvasHeight = 600;
-  extraPlayerNames = ['e500ff', '814007', '1d34fa'];
-  maxPlayers = 4;
   players = [];
   isGameOver = false;
   isGameStarted = false;
@@ -54,12 +52,6 @@ export class Game {
     on(GameEvent.findGame, (props) => this.onFindGame(props));
     on(GameEvent.startGame, (props) => this.onStartGame(props));
     on(GameEvent.newGame, (props) => this.onNewGame(props));
-  }
-
-  setNewPlayerNames(colorNames) {
-    colorNames.forEach((cn, index) => {
-      this.extraPlayerNames[index] = cn;
-    });
   }
 
   handleGameInput() {
@@ -93,10 +85,12 @@ export class Game {
     const loop = new GameLoop({
       update: (dt) => {
         this.gos.forEach((go) => go.update(dt));
+        this.players.forEach((go) => go.update(dt));
         this.checkGameOver();
       },
       render: () => {
         this.gos.forEach((go) => go.render());
+        this.players.forEach((go) => go.render());
       },
     });
     loop.start();
@@ -127,23 +121,21 @@ export class Game {
       color: '#' + createColorFromName('No_Name'),
       isAi: false,
       spaceShipRenderIndex: props.spaceShipRenderIndices[0],
-      playerId: 0,
+      playerId: 'player1',
+      isOpponent: false,
       x: getRandomPos(this.canvasWidth * this.scale),
       y: getRandomPos(this.canvasHeight * this.scale),
     });
     this.players.push(player);
-    this.gos.push(player);
     playSong(true); // load assets
     this.serverConnection = new ServerConnection(this, player);
     this.serverConnection.otherPlayersSub.subscribe((otherPlayers) => {
-      console.log('otherPlayers', otherPlayers);
       this.players = [player, ...otherPlayers];
-      this.gos.push(...otherPlayers);
     });
   }
   onStartGame() {
     console.log('client start game');
-    this.players.length = 0;
+    // this.players.length = 0;
     this.isGameStarted = true;
   }
   setPlayerColor(name) {

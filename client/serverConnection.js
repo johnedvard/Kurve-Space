@@ -62,7 +62,8 @@ export class ServerConnection {
         const player = new Player(this.game, this.game.scale, {
           color: '#' + createColorFromName(key),
           isAi: false,
-          playerId: 1,
+          playerId: key,
+          isOpponent: true,
           x: p.x,
           y: p.y,
         });

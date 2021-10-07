@@ -21,7 +21,7 @@ export class Menu {
         y: window.innerHeight / 2,
         color: '#' + createColorFromName('no_name'),
       };
-      const [leftKey, rightKey, weaponKey] = getPlayerControls(id);
+      const [leftKey, rightKey, weaponKey] = getPlayerControls();
       return new SpaceShip(PlayerState.idle, {
         scale: scale || 1,
         spriteProps: { ...spriteProps },

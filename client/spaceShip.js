@@ -36,14 +36,16 @@ export class SpaceShip {
         spaceShip.renderSpaceShip(this, spaceShip.isSubscriber);
       },
       update: function (dt) {
-        if (keyPressed(spaceShip.leftKey)) {
-          this.rotation -= rotationSpeed * dt;
-          spaceShip.rotating = true;
-        } else if (keyPressed(spaceShip.rightKey)) {
-          this.rotation += rotationSpeed * dt;
-          spaceShip.rotating = true;
-        } else {
-          spaceShip.rotating = false;
+        if (!props.isOpponent) {
+          if (keyPressed(spaceShip.leftKey)) {
+            this.rotation -= rotationSpeed * dt;
+            spaceShip.rotating = true;
+          } else if (keyPressed(spaceShip.rightKey)) {
+            this.rotation += rotationSpeed * dt;
+            spaceShip.rotating = true;
+          } else {
+            spaceShip.rotating = false;
+          }
         }
         // move the ship forward in the direction it's facing
         this.x = this.x + this.dx * dt * Math.cos(this.rotation);
