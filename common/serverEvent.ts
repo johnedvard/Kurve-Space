@@ -3,4 +3,5 @@ export const ServerEvent = {
   playerJoinedRoom: 'pjr',
   gameCountodown: 'gsc',
   gameStart: 'gs',
+  updatePlayerPos: 'upp',
 };

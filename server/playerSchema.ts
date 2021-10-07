@@ -7,9 +7,16 @@ export class Player extends Schema {
   @type('number')
   y: number = 2.22;
 
-  constructor({ x, y }) {
+  @type('number')
+  rotation: number = 0;
+
+  @type('string')
+  playerId: string = '';
+
+  constructor({ x, y, rotation }) {
     super();
     this.x = x;
     this.y = y;
+    this.rotation = rotation;
   }
 }

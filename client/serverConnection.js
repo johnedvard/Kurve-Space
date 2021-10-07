@@ -9,11 +9,11 @@ import { BehaviorSubject } from 'rxjs';
 export class ServerConnection {
   game;
   otherPlayersSub = new BehaviorSubject([]);
+  playerPosUpdateSub = new BehaviorSubject({});
   player1;
   constructor(game, player) {
     this.game = game;
     this.player1 = player;
-    console.log('player', this.player1);
     this.connectToServer();
   }
   async connectToServer() {
@@ -22,6 +22,7 @@ export class ServerConnection {
       this.room = await this.client.joinOrCreate('battle', {
         x: this.player1.x,
         y: this.player1.y,
+        rotation: this.player1.rotation,
       });
 
       this.room.onMessage(
@@ -35,9 +36,22 @@ export class ServerConnection {
       this.room.onMessage(ServerEvent.playerJoinedRoom, (evt) =>
         this.onPlayerJoinedRoom(evt)
       );
+      this.room.onMessage(ServerEvent.updatePlayerPos, (evt) =>
+        this.onUpdatePlayerPos(evt)
+      );
       console.log('joined successfully', this.room);
     } catch (e) {
       console.error('join error', e);
+    }
+  }
+
+  updatePlayerPos(player) {
+    if (this.room) {
+      this.room.send(ServerEvent.updatePlayerPos, {
+        x: player.x,
+        y: player.y,
+        rotation: player.rotation,
+      });
     }
   }
 
@@ -52,6 +66,10 @@ export class ServerConnection {
   onGameStart(evt) {
     console.log('game start', evt);
     emit(GameEvent.startGame, evt);
+  }
+
+  onUpdatePlayerPos(evt) {
+    this.playerPosUpdateSub.next(evt);
   }
 
   onPlayerJoinedRoom(evt) {

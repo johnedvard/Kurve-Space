@@ -160,7 +160,6 @@ class Player {
       // Add point to prevent alive player from dying right after being hit, but only if not rotating
       this.getEndTrail().push(Vector(this.sprite.x, this.sprite.y));
     }
-    console.log('playerId, this.playerId', playerId, this.playerId);
     if (playerId === this.playerId) {
       this.splitLineSegment({ segmentIndex, trailIndex });
     }
@@ -268,6 +267,18 @@ class Player {
   }
   get y() {
     return this.sprite.y;
+  }
+  get rotation() {
+    return this.sprite.rotation;
+  }
+  set x(x) {
+    this.sprite.x = x;
+  }
+  set y(y) {
+    this.sprite.y = y;
+  }
+  set rotation(rot) {
+    this.sprite.rotation = rot;
   }
 }
 export { Player };

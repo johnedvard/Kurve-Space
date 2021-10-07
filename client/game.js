@@ -55,22 +55,22 @@ export class Game {
   }
 
   handleGameInput() {
-    bindKeys(
-      'space',
-      (e) => {
-        if (this.isGameOver) {
-          emit(GameEvent.newGame, {});
-        } else if (this.isGameStarted && !this.isGameOver) {
-          if (
-            this.players.filter((p) => p.playerState === PlayerState.idle)
-              .length === this.players.length
-          ) {
-            emit(GameEvent.startTrace);
-          }
-        }
-      },
-      { handler: 'keyup' }
-    );
+    // bindKeys(
+    //   'space',
+    //   (e) => {
+    //     if (this.isGameOver) {
+    //       emit(GameEvent.newGame, {});
+    //     } else if (this.isGameStarted && !this.isGameOver) {
+    //       if (
+    //         this.players.filter((p) => p.playerState === PlayerState.idle)
+    //           .length === this.players.length
+    //       ) {
+    //         emit(GameEvent.startTrace);
+    //       }
+    //     }
+    //   },
+    //   { handler: 'keyup' }
+    // );
     bindKeys(
       'm',
       (e) => {
@@ -86,6 +86,9 @@ export class Game {
       update: (dt) => {
         this.gos.forEach((go) => go.update(dt));
         this.players.forEach((go) => go.update(dt));
+        if (this.serverConnection) {
+          this.serverConnection.updatePlayerPos(this.player);
+        }
         this.checkGameOver();
       },
       render: () => {
@@ -126,6 +129,7 @@ export class Game {
       x: getRandomPos(this.canvasWidth * this.scale),
       y: getRandomPos(this.canvasHeight * this.scale),
     });
+    this.player = player;
     this.players.push(player);
     playSong(true); // load assets
     this.serverConnection = new ServerConnection(this, player);
@@ -135,7 +139,17 @@ export class Game {
   }
   onStartGame() {
     console.log('client start game');
-    // this.players.length = 0;
+    emit(GameEvent.startTrace);
+    this.serverConnection.playerPosUpdateSub.subscribe((player) => {
+      const playerToUpdate = this.players.find(
+        (p) => p.playerId === player.playerId
+      );
+      if (playerToUpdate) {
+        playerToUpdate.rotation = player.rotation;
+        playerToUpdate.x = player.x;
+        playerToUpdate.y = player.y;
+      }
+    });
     this.isGameStarted = true;
   }
   setPlayerColor(name) {

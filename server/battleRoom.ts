@@ -17,9 +17,9 @@ export class BattleRoom extends Room {
     this.setState(new State());
   }
 
-  onJoin(client, { x, y }: { x: number; y: number }) {
+  onJoin(client, { x, y, rotation }: Player) {
     console.log('on join', x, y);
-    this.state.players.set(client.sessionId, new Player({ x, y }));
+    this.state.players.set(client.sessionId, new Player({ x, y, rotation }));
     this.broadcast(ServerEvent.playerJoinedRoom, {
       players: this.state.players,
     });
@@ -31,5 +31,13 @@ export class BattleRoom extends Room {
   onLeave(client, options) {
     console.log('client left');
     this.state.players.delete(client.sessionId);
+  }
+
+  updatePlayer(client, player: Player) {
+    const currPlayer = this.state.players.get(client.sessionId);
+    currPlayer.x = player.x;
+    currPlayer.x = player.y;
+    currPlayer.x = player.rotation;
+    this.state.players.set(client.sessionId, currPlayer);
   }
 }
