@@ -49,17 +49,17 @@ module.exports = {
     usedExports: true,
     minimizer: [
       // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-      `...`,
-      new JsonMinimizerPlugin(),
-      new HtmlMinimizerPlugin({
-        test: /\.html/i,
-      }),
-      new CssMinimizerPlugin({
-        test: /\.css$/i,
-      }),
-      new UglifyJsPlugin({
-        test: /\.js(\?.*)?$/i,
-      }),
+      // `...`,
+      // new JsonMinimizerPlugin(),
+      // new HtmlMinimizerPlugin({
+      //   test: /\.html/i,
+      // }),
+      // new CssMinimizerPlugin({
+      //   test: /\.css$/i,
+      // }),
+      // new UglifyJsPlugin({
+      //   test: /\.js(\?.*)?$/i,
+      // }),
     ],
   },
 };

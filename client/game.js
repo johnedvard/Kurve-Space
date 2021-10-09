@@ -95,6 +95,7 @@ export class Game {
         this.gos.forEach((go) => go.render());
         this.players.forEach((go) => go.render());
       },
+      blur: true,
     });
     loop.start();
   }

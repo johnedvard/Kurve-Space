@@ -17,7 +17,7 @@ export class ServerConnection {
     this.connectToServer();
   }
   async connectToServer() {
-    this.client = new Colyseus.Client('ws://localhost:3000');
+    this.client = new Colyseus.Client('ws://zbvxub.colyseus.in');
     try {
       this.room = await this.client.joinOrCreate('battle', {
         x: this.player1.x,

@@ -10,16 +10,22 @@
   "license": "ISC",
   "private": false,
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.ts",
+    "build": "npm run clean && tsc && node copyfiles package.json ./lib && node copyfiles arena.env ./lib",
+    "clean": "node node_modules/rimraf/bin lib"
   },
   "dependencies": {
+    "@colyseus/arena": "^0.14.24",
+    "@colyseus/monitor": "^0.14.22",
     "colyseus": "^0.14.23",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "node": "^16.10.0",
     "socket.io": "^4.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
+    "copyfiles": "^2.4.1",
     "nodemon": "^2.0.13",
     "ts-node-dev": "^1.1.8"
   }
