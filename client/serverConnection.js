@@ -1,10 +1,15 @@
 import * as Colyseus from 'colyseus.js';
-import { emit } from 'kontra';
+import { emit, on } from 'kontra';
 import { ServerEvent } from '../common/serverEvent';
 import { GameEvent } from './gameEvent';
 import { Player } from './player';
 import { createColorFromName } from './gameUtils';
 import { BehaviorSubject } from 'rxjs';
+
+const ENDPOINT =
+  process.env.TARGET === 'development'
+    ? 'ws://localhost:2567'
+    : 'wss://zbvxub.colyseus.in';
 
 export class ServerConnection {
   game;
@@ -15,15 +20,17 @@ export class ServerConnection {
     this.game = game;
     this.player1 = player;
     this.connectToServer();
+    on(GameEvent.gameOver, (evt) => this.onGameOver(evt));
   }
   async connectToServer() {
-    this.client = new Colyseus.Client('ws://zbvxub.colyseus.in');
+    this.client = new Colyseus.Client(ENDPOINT);
     try {
       this.room = await this.client.joinOrCreate('battle', {
         x: this.player1.x,
         y: this.player1.y,
         rotation: this.player1.rotation,
       });
+      this.player1.playerId = this.room.sessionId;
 
       this.room.onMessage(
         ServerEvent.gameCountodown,
@@ -55,6 +62,13 @@ export class ServerConnection {
     }
   }
 
+  onGameOver({ winner }) {
+    console.log('winner', winner);
+    if (winner) {
+      this.room.send(ServerEvent.gameOver, { playerId: winner.playerId });
+    }
+  }
+
   onMove(evt) {
     console.log('got message from client', message);
   }
@@ -65,7 +79,11 @@ export class ServerConnection {
 
   onGameStart(evt) {
     console.log('game start', evt);
-    emit(GameEvent.startGame, evt);
+    if (evt && evt.round === 0) {
+      emit(GameEvent.startGame, evt);
+    } else {
+      emit(GameEvent.newGame, evt);
+    }
   }
 
   onUpdatePlayerPos(evt) {

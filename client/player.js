@@ -17,7 +17,6 @@ class Player {
   speed;
   effect;
   playerId;
-  rotating = false;
   maxBullets = 1;
   numBullets = this.maxBullets;
   bullets = [];
@@ -103,6 +102,9 @@ class Player {
     this.updateEngineEffect(dt);
     this.wallCollision();
     this.updateDeadPlayer();
+    if (this.game.serverConnection && this.spaceShip.rotating) {
+      this.game.serverConnection.updatePlayerPos(this);
+    }
     this.bullets.forEach((b) => b.update(dt));
   }
   render() {
@@ -234,12 +236,12 @@ class Player {
     this.effect.sprite.color = this.sprite.color;
     this.effect.update(dt);
   }
-  resetPlayer() {
+  resetPlayer({ pos }) {
     this.trails.splice(0, this.trails.length, []); // remove all segments
 
     this.numBullets = this.maxBullets;
     this.setPlayerState(PlayerState.idle);
-    this.resetStartPos();
+    this.resetStartPos(pos);
   }
   // The last trail of all line segments
   getEndTrail() {
@@ -254,13 +256,9 @@ class Player {
     this.sprite.color = color;
     this.spaceShip.sprite.color = color;
   }
-  resetStartPos() {
-    this.spaceShip.sprite.x = getRandomPos(
-      this.game.canvasWidth * this.game.scale
-    );
-    this.spaceShip.sprite.y = getRandomPos(
-      this.game.canvasHeight * this.game.scale
-    );
+  resetStartPos(pos) {
+    this.spaceShip.sprite.x = pos.x;
+    this.spaceShip.sprite.y = pos.y;
   }
   get x() {
     return this.sprite.x;
@@ -278,6 +276,7 @@ class Player {
     this.sprite.y = y;
   }
   set rotation(rot) {
+    this.spaceShip.rotating = true;
     this.sprite.rotation = rot;
   }
 }

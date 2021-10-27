@@ -1,15 +1,16 @@
 import Arena from '@colyseus/arena';
 import { monitor } from '@colyseus/monitor';
-import cors from 'cors';
-/**
- * Import your Room files
- */
-import { BattleRoom } from './battleRoom';
+
+import { BattleRoom } from './rooms/battleRoom';
 
 export default Arena({
   getId: () => 'Kurve Space',
 
   initializeGameServer: (gameServer) => {
+    console.log('process.env.NODE_ENV asd', process.env.NODE_ENV);
+    if (process.env.NODE_ENV !== 'production') {
+      gameServer.simulateLatency(200);
+    }
     /**
      * Define your room handlers:
      */
@@ -17,7 +18,6 @@ export default Arena({
   },
 
   initializeExpress: (app) => {
-    app.use(cors());
     /**
      * Bind your custom express routes here:
      */

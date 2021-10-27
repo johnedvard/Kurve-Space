@@ -36,6 +36,7 @@ export class SpaceShip {
         spaceShip.renderSpaceShip(this, spaceShip.isSubscriber);
       },
       update: function (dt) {
+        spaceShip.rotating = false;
         if (!props.isOpponent) {
           if (keyPressed(spaceShip.leftKey)) {
             this.rotation -= rotationSpeed * dt;
@@ -43,8 +44,6 @@ export class SpaceShip {
           } else if (keyPressed(spaceShip.rightKey)) {
             this.rotation += rotationSpeed * dt;
             spaceShip.rotating = true;
-          } else {
-            spaceShip.rotating = false;
           }
         }
         // move the ship forward in the direction it's facing

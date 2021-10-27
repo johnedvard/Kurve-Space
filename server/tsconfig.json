@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "outDir": "./lib",
+    "outDir": "lib",
+    "rootDir": "",
     "module": "commonJs",
     "lib": ["es6"],
     "target": "es2016",
@@ -15,6 +16,5 @@
     "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true
   },
-
-  "exclude": ["node_modules", "lib"]
+  "exclude": ["node_modules"]
 }

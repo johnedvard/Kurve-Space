@@ -25,7 +25,7 @@ export class Game {
   gos = [];
   player;
   menu;
-  scale;
+  scale = 2;
   canvasWidth = 800;
   canvasHeight = 600;
   players = [];
@@ -39,7 +39,6 @@ export class Game {
     this.initNear();
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.scale = 2;
     canvas.width = this.canvasWidth * this.scale;
     canvas.height = this.canvasHeight * this.scale;
     init(canvas);
@@ -86,9 +85,6 @@ export class Game {
       update: (dt) => {
         this.gos.forEach((go) => go.update(dt));
         this.players.forEach((go) => go.update(dt));
-        if (this.serverConnection) {
-          this.serverConnection.updatePlayerPos(this.player);
-        }
         this.checkGameOver();
       },
       render: () => {
@@ -103,7 +99,11 @@ export class Game {
     const deadPlayers = this.players.filter(
       (p) => p.playerState === PlayerState.dead
     );
-    if (this.isGameStarted && deadPlayers.length >= this.players.length - 1) {
+    if (
+      !this.isGameOver &&
+      this.isGameStarted &&
+      deadPlayers.length >= this.players.length - 1
+    ) {
       this.isGameOver = true;
       emit(GameEvent.gameOver, {
         winner: this.players.find((p) => p.playerState !== PlayerState.dead),
@@ -137,10 +137,6 @@ export class Game {
     this.serverConnection.otherPlayersSub.subscribe((otherPlayers) => {
       this.players = [player, ...otherPlayers];
     });
-  }
-  onStartGame() {
-    console.log('client start game');
-    emit(GameEvent.startTrace);
     this.serverConnection.playerPosUpdateSub.subscribe((player) => {
       const playerToUpdate = this.players.find(
         (p) => p.playerId === player.playerId
@@ -151,6 +147,10 @@ export class Game {
         playerToUpdate.y = player.y;
       }
     });
+  }
+  onStartGame() {
+    console.log('client start game');
+    emit(GameEvent.startTrace);
     this.isGameStarted = true;
   }
   setPlayerColor(name) {
@@ -160,8 +160,9 @@ export class Game {
   }
   onNewGame(props) {
     this.isGameOver = false;
+    console.log('props ', props);
     this.players.forEach((p) => {
-      p.resetPlayer();
+      p.resetPlayer({ pos: props.playersPos[p.playerId].pos });
     });
   }
 }

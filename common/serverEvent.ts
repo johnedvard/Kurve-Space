@@ -3,5 +3,6 @@ export const ServerEvent = {
   playerJoinedRoom: 'pjr',
   gameCountodown: 'gsc',
   gameStart: 'gs',
+  gameOver: 'go',
   updatePlayerPos: 'upp',
 };

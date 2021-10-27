@@ -9,6 +9,7 @@
 
 ## server
 server/lib
+server/common
 
 ## misc
 .DS_Store
